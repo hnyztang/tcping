@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <sys/time.h>
 #include <strings.h>
+#include <string.h>
 
 #define PACKET_SIZE     4096
 #define MAX_WAIT_TIME   5    
@@ -94,7 +95,8 @@ void send_packet()
 }
 /*接收所有ICMP报文*/
 void recv_packet()
-{       int n, fromlen;
+{       int n;
+        unsigned int fromlen;
         extern int errno;
         signal(SIGALRM,statistics);
         fromlen=sizeof(from);
@@ -174,7 +176,7 @@ int main(int argc,char *argv[])
                 {       perror("gethostbyname error");
                         exit(1);
                 }
-                memcpy(&dest_addr.sin_addr, host->h_addr, host->h_length);
+                memcpy( (char *)&dest_addr,(char *)&inaddr,host->h_length);
         }
         else    /*是ip地址*/
                 memcpy( (char *)&dest_addr,(char *)&inaddr,host->h_length);
