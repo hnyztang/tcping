@@ -84,6 +84,7 @@ void finish(void) {
            (unsigned long)(tsum/1000), (long)(tsum%1000),
            (long)tmax/1000, (long)tmax%1000
            );
+    putchar('\n');
   }
 }
 
