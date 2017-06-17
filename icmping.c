@@ -90,7 +90,7 @@ void send_packet()
                 {       perror("sendto error");
                         continue;
                 }
-                sleep(1); /*每隔一秒发送一个ICMP报文*/
+                // sleep(1); /*每隔一秒发送一个ICMP报文*/
         }
 }
 /*接收所有ICMP报文*/
@@ -132,7 +132,7 @@ int unpack(char *buf,int len)
         if( (icmp->icmp_type==ICMP_ECHOREPLY) && (icmp->icmp_id==pid) )
         {       tvsend=(struct timeval *)icmp->icmp_data;
                 tv_sub(&tvrecv,tvsend);  /*接收和发送的时间差*/
-                rtt=tvrecv.tv_sec*1000+tvrecv.tv_usec/1000;  /*以毫秒为单位计算rtt*/
+                rtt=tvrecv.tv_sec*1000 + tvrecv.tv_usec/1000 + tvrecv.tv_usec%1000/1000.0;  /*以毫秒为单位计算rtt*/
                 /*显示相关信息*/
                 printf("%d byte from %s: icmp_seq=%u ttl=%d rtt=%.3f ms\n",
                         len,
