@@ -171,15 +171,15 @@ int main(int argc,char *argv[])
         bzero(&dest_addr,sizeof(dest_addr));
         dest_addr.sin_family=AF_INET;
         /*判断是主机名还是ip地址*/
-        if( (inaddr=inet_addr(argv[1]))==INADDR_NONE)
-        {       if((host=gethostbyname(argv[1]) )==NULL) /*是主机名*/
+        if( (inaddr=inet_addr(argv[1])) == INADDR_NONE )
+        {       if( (host=gethostbyname(argv[1])) == NULL ) /*是主机名*/
                 {       perror("gethostbyname error");
                         exit(1);
                 }
                 memcpy(&dest_addr.sin_addr, host->h_addr, host->h_length);
         }
         else    /*是ip地址*/
-                memcpy( (char *)&dest_addr,(char *)&inaddr,host->h_length);
+                memcpy(&dest_addr.sin_addr, &inaddr, sizeof(inaddr));
         /*获取main的进程id,用于设置ICMP的标志符*/
         pid=getpid();
         printf("PING %s (%s): %d bytes data in ICMP packets.\n",argv[1],
