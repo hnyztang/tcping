@@ -95,8 +95,7 @@ void send_packet()
 }
 /*接收所有ICMP报文*/
 void recv_packet()
-{       int n;
-        unsigned int fromlen;
+{       int n, fromlen;
         extern int errno;
         signal(SIGALRM,statistics);
         fromlen=sizeof(from);
@@ -151,7 +150,7 @@ int main(int argc,char *argv[])
         int waittime=MAX_WAIT_TIME;
         int size=50*1024;
         if(argc<2)
-        {       printf("usage:%s hostname/IP address\n",argv[0]);
+        {       printf("usage:%s <host>\n", argv[0]);
                 exit(1);
         }
         if( (protocol=getprotobyname("icmp") )==NULL)
@@ -176,13 +175,13 @@ int main(int argc,char *argv[])
                 {       perror("gethostbyname error");
                         exit(1);
                 }
-                memcpy( (char *)&dest_addr,(char *)&inaddr,host->h_length);
+                memcpy(&dest_addr.sin_addr, host->h_addr, host->h_length);
         }
         else    /*是ip地址*/
                 memcpy( (char *)&dest_addr,(char *)&inaddr,host->h_length);
         /*获取main的进程id,用于设置ICMP的标志符*/
         pid=getpid();
-        printf("PING %s(%s): %d bytes data in ICMP packets.\n",argv[1],
+        printf("PING %s (%s): %d bytes data in ICMP packets.\n",argv[1],
                         inet_ntoa(dest_addr.sin_addr),datalen);
         send_packet();  /*发送所有ICMP报文*/
         recv_packet();  /*接收所有ICMP报文*/
