@@ -95,7 +95,8 @@ void send_packet()
 }
 /*接收所有ICMP报文*/
 void recv_packet()
-{       int n, fromlen;
+{       int n;
+        unsigned int fromlen;
         extern int errno;
         signal(SIGALRM,statistics);
         fromlen=sizeof(from);
