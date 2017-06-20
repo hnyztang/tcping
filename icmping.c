@@ -23,7 +23,7 @@ char recvpacket[PACKET_SIZE];
 int sockfd,datalen=56;
 int nsend=0,nreceived=0;
 struct sockaddr_in dest_addr;
-pid_t pid;
+uint16_t pid;
 struct sockaddr_in from;
 struct timeval tvrecv;
 void statistics(int signo);
@@ -72,7 +72,13 @@ int pack(int pack_no)
         icmp->icmp_code=0;
         icmp->icmp_cksum=0;
         icmp->icmp_seq=pack_no;
-        icmp->icmp_id=pid;
+
+        printf("[debug] pid_t size:%d\n", (int)sizeof(pid_t));
+        printf("[debug] icmp_id size:%d\n", (int)sizeof(n_short));
+        printf("idda %08x %d\n", pid, pid);
+        icmp->icmp_id = pid;
+        printf("iddb %08x %d\n", icmp->icmp_id, icmp->icmp_id);
+
         packsize=8+datalen;
         tval= (struct timeval *)icmp->icmp_data;
         gettimeofday(tval,NULL);    /*记录发送时间*/
