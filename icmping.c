@@ -79,38 +79,44 @@ int pack(int pack_no)
     icmp->icmp_cksum=cal_chksum( (unsigned short *)icmp,packsize); /*校验算法*/
     return packsize;
 }
-/*发送三个ICMP报文*/
-void send_packet()
-{    int packetsize;
-    while( nsend<MAX_NO_PACKETS)
-    {    nsend++;
-        packetsize=pack(nsend); /*设置ICMP报头*/
-        if( sendto(sockfd,sendpacket,packetsize,0,
-             (struct sockaddr *)&dest_addr,sizeof(dest_addr) )<0 )
-        {    perror("sendto error");
-            continue;
-        }
-        // sleep(1); /*每隔一秒发送一个ICMP报文*/
-    }
-}
-/*接收所有ICMP报文*/
-void recv_packet()
-{    int n;
+/*处理三个ICMP报文*/
+void parse_packet()
+{
+    int packetsize;
+    int n;
     unsigned int fromlen;
     extern int errno;
     signal(SIGALRM,statistics);
-    fromlen=sizeof(from);
-    while( nreceived<nsend)
-    {    alarm(MAX_WAIT_TIME);
-        if( (n=recvfrom(sockfd,recvpacket,sizeof(recvpacket),0,
-                (struct sockaddr *)&from,&fromlen)) <0)
-        {    if(errno==EINTR)continue;
+    fromlen = sizeof(from);
+
+    while(nsend < MAX_NO_PACKETS)
+    {
+        // send package
+        nsend++;
+        packetsize = pack(nsend); /*设置ICMP报头*/
+        if(sendto(sockfd, sendpacket, packetsize, 0,
+             (struct sockaddr *)&dest_addr, sizeof(dest_addr)) < 0)
+        {
+            perror("sendto error");
+            continue;
+        }
+
+        // recv package
+        alarm(MAX_WAIT_TIME);
+        if ((n = recvfrom(sockfd, recvpacket, sizeof(recvpacket), 0,
+                        (struct sockaddr *)&from, &fromlen)) < 0)
+        {
+            if (errno == EINTR)
+                continue;
             perror("recvfrom error");
             continue;
         }
-        gettimeofday(&tvrecv,NULL); /*记录接收时间*/
-        if(unpack(recvpacket,n)==-1)continue;
+        gettimeofday(&tvrecv, NULL);
+        if (unpack(recvpacket, n) == -1)
+            continue;
         nreceived++;
+
+        sleep(1); /*每隔一秒发送一个ICMP报文*/
     }
 }
 /*剥去ICMP报头*/
@@ -184,8 +190,7 @@ int main(int argc,char *argv[])
     pid=getpid();
     printf("PING %s (%s): %d bytes data in ICMP packets.\n",argv[1],
             inet_ntoa(dest_addr.sin_addr),datalen);
-    send_packet(); /*发送所有ICMP报文*/
-    recv_packet(); /*接收所有ICMP报文*/
+    parse_packet(); /*开始处理所有ICMP报文*/
     statistics(SIGALRM); /*进行统计*/
     return 0;
 }
