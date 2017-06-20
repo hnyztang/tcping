@@ -35,8 +35,8 @@ int unpack(char *buf,int len);
 void tv_sub(struct timeval *out,struct timeval *in);
 void statistics(int signo)
 {       printf("\n--------------------PING statistics-------------------\n");
-        printf("%d packets transmitted, %d received , %%%d lost\n",nsend,nreceived,
-                        (nsend-nreceived)/nsend*100);
+        printf("%d packets transmitted, %d received , %d%% lost\n",nsend,nreceived,
+                        (nsend-nreceived)*100/nsend);
         close(sockfd);
         exit(1);
 }
@@ -72,13 +72,7 @@ int pack(int pack_no)
         icmp->icmp_code=0;
         icmp->icmp_cksum=0;
         icmp->icmp_seq=pack_no;
-
-        printf("[debug] pid_t size:%d\n", (int)sizeof(pid_t));
-        printf("[debug] icmp_id size:%d\n", (int)sizeof(n_short));
-        printf("idda %08x %d\n", pid, pid);
         icmp->icmp_id = pid;
-        printf("iddb %08x %d\n", icmp->icmp_id, icmp->icmp_id);
-
         packsize=8+datalen;
         tval= (struct timeval *)icmp->icmp_data;
         gettimeofday(tval,NULL);    /*记录发送时间*/
